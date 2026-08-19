@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)file:///Users/a.mkhitaryan/Downloads/index.html -->
+<html lang="ru" style="--tg-viewport-height: 100vh; --tg-viewport-stable-height: 100vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Мочи</title>
+<script src="./index_files/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg-top:#FCEFEA; --bg-bot:#F1DEEF;
+    --cream:#FFF3DF; --cream-sh:#FFE2C0;
+    --plum:#5A4A6A; --plum-soft:#8C7BA0;
+    --pink:#FF7BA0; --cheek:#FF9EB5;
+    --mint:#8FD9C9; --honey:#FFC95E;
+    --card:rgba(255,255,255,.55); --line:rgba(90,74,106,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:'Fredoka',system-ui,sans-serif;color:var(--plum);
+    background:linear-gradient(170deg,var(--bg-top),var(--bg-bot));
+    background-attachment:fixed;overscroll-behavior:none;
+    -webkit-user-select:none;user-select:none;
+  }
+  #app{
+    min-height:100dvh;display:flex;flex-direction:column;
+    padding:max(16px,env(safe-area-inset-top)) 20px max(20px,env(safe-area-inset-bottom));
+    max-width:480px;margin:0 auto;
+  }
+
+  /* ── header ── */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .name-wrap{display:flex;align-items:baseline;gap:8px;min-width:0}
+  .name{font-size:26px;font-weight:600;letter-spacing:.2px;cursor:pointer;
+    border-bottom:2px dashed transparent;line-height:1.1}
+  .name:active{opacity:.6}
+  .lvl{font-size:13px;font-weight:500;color:var(--plum-soft);white-space:nowrap}
+  .mood-face{font-size:22px}
+
+  /* ── stat pills ── */
+  .stats{display:flex;gap:10px;margin-top:16px}
+  .pill{flex:1;background:var(--card);border-radius:16px;padding:8px 10px 9px;
+    backdrop-filter:blur(6px)}
+  .pill .row{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;
+    color:var(--plum-soft);margin-bottom:6px}
+  .pill .ico{font-size:13px}
+  .bar{height:8px;border-radius:8px;background:rgba(90,74,106,.10);overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:8px;width:50%;
+    transition:width .5s cubic-bezier(.34,1.4,.5,1)}
+  .bar.hunger i{background:linear-gradient(90deg,#FFB36B,var(--honey))}
+  .bar.happy i{background:linear-gradient(90deg,#FF9EC4,var(--pink))}
+  .bar.energy i{background:linear-gradient(90deg,#9FE6D6,var(--mint))}
+
+  /* ── stage ── */
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;position:relative;gap:4px}
+
+  .bubble{
+    position:relative;background:#fff;color:var(--plum);font-weight:500;
+    font-size:15px;padding:11px 16px;border-radius:18px;max-width:240px;text-align:center;
+    box-shadow:0 8px 22px rgba(90,74,106,.13);
+    opacity:0;transform:translateY(8px) scale(.92);transition:.32s cubic-bezier(.34,1.5,.5,1);
+    pointer-events:none;min-height:0;margin-bottom:6px}
+  .bubble.show{opacity:1;transform:translateY(0) scale(1)}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+    border:7px solid transparent;border-top-color:#fff;border-bottom:0}
+
+  /* ── the pet ── */
+  .pet{position:relative;width:188px;height:172px;cursor:pointer;
+    transform-origin:50% 100%;animation:float 4.5s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+  .shadow{position:absolute;left:50%;bottom:-6px;width:120px;height:20px;
+    background:rgba(90,74,106,.13);border-radius:50%;transform:translateX(-50%);
+    filter:blur(3px);animation:shadow 4.5s ease-in-out infinite}
+  @keyframes shadow{0%,100%{transform:translateX(-50%) scale(1);opacity:.55}
+    50%{transform:translateX(-50%) scale(.82);opacity:.4}}
+
+  .antenna{position:absolute;left:50%;top:-14px;width:5px;height:30px;
+    background:var(--cream-sh);border-radius:5px;transform-origin:50% 100%;
+    transform:translateX(-50%) rotate(-6deg);animation:wob 3.8s ease-in-out infinite}
+  .antenna::after{content:"";position:absolute;top:-12px;left:50%;width:16px;height:16px;
+    transform:translateX(-50%);border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,var(--honey));
+    box-shadow:0 0 12px rgba(255,201,94,.7)}
+  @keyframes wob{0%,100%{transform:translateX(-50%) rotate(-7deg)}
+    50%{transform:translateX(-50%) rotate(7deg)}}
+
+  .body{position:absolute;inset:0;top:14px;
+    background:radial-gradient(circle at 38% 32%,#FFFBF1 0%,var(--cream) 52%,var(--cream-sh) 100%);
+    border-radius:52% 52% 46% 46%/58% 58% 42% 42%;
+    box-shadow:inset -10px -14px 24px rgba(255,200,150,.35),0 16px 30px rgba(90,74,106,.12);
+    transition:border-radius .25s,transform .25s}
+
+  .face{position:absolute;inset:0;top:14px}
+  .eye{position:absolute;top:46%;width:17px;height:21px;background:#4A3D5A;
+    border-radius:50%;transition:height .12s,transform .2s}
+  .eye.l{left:33%}.eye.r{right:33%}
+  .eye::after{content:"";position:absolute;top:3px;left:3px;width:6px;height:6px;
+    background:#fff;border-radius:50%}
+  .cheek{position:absolute;top:60%;width:20px;height:13px;background:var(--cheek);
+    border-radius:50%;opacity:.75;filter:blur(.4px)}
+  .cheek.l{left:24%}.cheek.r{right:24%}
+  .mouth{position:absolute;top:62%;left:50%;width:16px;height:8px;
+    border:2.5px solid #4A3D5A;border-top:0;border-radius:0 0 12px 12px;
+    transform:translateX(-50%);transition:.2s}
+
+  /* blink */
+  .pet.blink .eye{height:3px;transform:translateY(8px)}
+  /* moods */
+  .pet[data-mood="happy"] .eye{height:13px;border-radius:14px 14px 4px 4px;
+    background:#4A3D5A;transform:translateY(-2px)}
+  .pet[data-mood="happy"] .eye::after{opacity:0}
+  .pet[data-mood="happy"] .mouth{width:22px;height:11px}
+  .pet[data-mood="hungry"] .mouth{width:11px;height:11px;border-radius:50%;
+    border:2.5px solid #4A3D5A;top:64%}
+  .pet[data-mood="sad"] .eye{transform:translateY(2px)}
+  .pet[data-mood="sad"] .mouth{height:7px;border-radius:12px 12px 0 0;border-top:2.5px solid #4A3D5A;border-bottom:0;top:66%}
+  .pet[data-mood="sad"] .cheek{opacity:.4}
+  .pet[data-mood="sleepy"] .eye,.pet.asleep .eye{height:3px;width:20px;border-radius:6px;
+    background:transparent;border-bottom:3px solid #4A3D5A;transform:translateY(6px)}
+  .pet[data-mood="sleepy"] .eye::after,.pet.asleep .eye::after{opacity:0}
+  .pet.asleep .mouth{width:10px;height:6px;border-width:2px}
+
+  /* action animations */
+  .pet.bounce{animation:bounce .55s cubic-bezier(.34,1.5,.4,1)}
+  @keyframes bounce{0%{transform:translateY(0)}30%{transform:translateY(-26px) scaleX(.94)}
+    55%{transform:translateY(0) scaleY(.86) scaleX(1.1)}75%{transform:translateY(-6px) scaleY(1.04)}100%{transform:translateY(0)}}
+  .pet.squish .body{transform:scaleY(.8) scaleX(1.12);border-radius:60% 60% 50% 50%/70% 70% 40% 40%}
+  .pet.chomp .mouth{animation:chomp .4s ease}
+  @keyframes chomp{0%,100%{height:8px}50%{height:16px;width:20px}}
+
+  .zzz{position:absolute;right:18px;top:24px;font-size:20px;color:var(--plum-soft);
+    opacity:0;font-weight:600}
+  .pet.asleep .zzz{animation:zzz 2.6s ease-in-out infinite}
+  @keyframes zzz{0%{opacity:0;transform:translate(0,0) scale(.6)}
+    30%{opacity:.9}100%{opacity:0;transform:translate(14px,-26px) scale(1.1)}}
+
+  .fx{position:absolute;font-size:22px;pointer-events:none;animation:rise 1s ease-out forwards}
+  @keyframes rise{0%{opacity:0;transform:translateY(0) scale(.5)}
+    20%{opacity:1}100%{opacity:0;transform:translateY(-90px) scale(1.2)}}
+
+  /* ── actions ── */
+  .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .btn{border:0;background:var(--card);backdrop-filter:blur(6px);border-radius:20px;
+    padding:13px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-family:inherit;color:var(--plum);font-size:12px;font-weight:500;cursor:pointer;
+    box-shadow:0 4px 14px rgba(90,74,106,.07);transition:transform .12s,background .2s}
+  .btn .e{font-size:24px}
+  .btn:active{transform:scale(.9);background:#fff}
+  .btn.on{background:var(--plum);color:#fff}
+
+  @media (prefers-reduced-motion:reduce){
+    .pet,.shadow,.antenna{animation:none}
+    *{transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <div class="name-wrap">
+      <div class="name" id="name" title="нажми, чтобы переименовать">Мочи</div>
+      <span class="mood-face" id="face">💤</span>
+    </div>
+    <div class="lvl" id="lvl">♡ дружба 2</div>
+  </div>
+
+  <div class="stats">
+    <div class="pill"><div class="row"><span class="ico">🍓</span>Сытость</div>
+      <div class="bar hunger"><i id="b-hunger" style="width: 90.0361%;"></i></div></div>
+    <div class="pill"><div class="row"><span class="ico">💕</span>Радость</div>
+      <div class="bar happy"><i id="b-happy" style="width: 100%;"></i></div></div>
+    <div class="pill"><div class="row"><span class="ico">⚡</span>Энергия</div>
+      <div class="bar energy"><i id="b-energy" style="width: 66.598%;"></i></div></div>
+  </div>
+
+  <div class="stage">
+    <div class="bubble" id="bubble">Споки... 💤</div>
+    <div class="pet asleep" id="pet" data-mood="sleepy">
+      <div class="antenna"></div>
+      <div class="body"></div>
+      <div class="face">
+        <div class="eye l"></div><div class="eye r"></div>
+        <div class="cheek l"></div><div class="cheek r"></div>
+        <div class="mouth"></div>
+      </div>
+      <div class="zzz">z</div>
+    </div>
+    <div class="shadow"></div>
+  </div>
+
+  <div class="acts">
+    <button class="btn" id="feed"><span class="e">🍓</span>Покормить</button>
+    <button class="btn" id="play"><span class="e">🎈</span>Играть</button>
+    <button class="btn" id="pet-btn"><span class="e">🤍</span>Погладить</button>
+    <button class="btn on" id="sleep"><span class="e">☀️</span>Будить</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var tg = window.Telegram && window.Telegram.WebApp;
+  if(tg){ try{ tg.ready(); tg.expand(); }catch(e){} }
+  function haptic(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t||'light'); }catch(e){} }
+  function notify(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(t||'success'); }catch(e){} }
+
+  /* ── storage: Telegram CloudStorage → localStorage → memory ── */
+  var KEY='mochi_v1', mem={};
+  var hasCloud = tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9');
+  function load(cb){
+    if(hasCloud){ tg.CloudStorage.getItem(KEY,function(err,val){ cb(parse(!err&&val)); }); return; }
+    try{ cb(parse(localStorage.getItem(KEY))); }catch(e){ cb(parse(mem[KEY])); }
+  }
+  function save(){
+    var s=JSON.stringify(state);
+    if(hasCloud){ try{ tg.CloudStorage.setItem(KEY,s); }catch(e){} }
+    try{ localStorage.setItem(KEY,s); }catch(e){ mem[KEY]=s; }
+  }
+  function parse(v){ if(!v) return null; try{ return JSON.parse(v); }catch(e){ return null; } }
+
+  /* ── state ── */
+  var state={ name:'Мочи', hunger:80, happy:80, energy:80,
+              asleep:false, friend:0, last:Date.now() };
+  var clamp=function(n){ return Math.max(0,Math.min(100,n)); };
+
+  // decay per minute (awake)
+  var DECAY={ hunger:.25, happy:.18, energy:.15 };
+  function applyTime(){
+    var mins=(Date.now()-state.last)/60000;
+    if(mins<=0){ state.last=Date.now(); return; }
+    if(state.asleep){
+      state.energy=clamp(state.energy + mins*.7);
+      state.hunger=clamp(state.hunger - mins*DECAY.hunger*.5);
+      if(state.energy>=100){ state.asleep=false; }
+    }else{
+      state.hunger=clamp(state.hunger - mins*DECAY.hunger);
+      state.happy =clamp(state.happy  - mins*DECAY.happy);
+      state.energy=clamp(state.energy - mins*DECAY.energy);
+    }
+    state.last=Date.now();
+  }
+
+  /* ── dom ── */
+  var $=function(id){ return document.getElementById(id); };
+  var pet=$('pet'), bubble=$('bubble'), faceEl=$('face'), nameEl=$('name'), lvlEl=$('lvl');
+
+  function mood(){
+    if(state.asleep) return 'sleepy';
+    if(state.energy<22) return 'sleepy';
+    if(state.hunger<28) return 'hungry';
+    var avg=(state.hunger+state.happy+state.energy)/3;
+    if(avg>70) return 'happy';
+    if(avg>42) return 'content';
+    return 'sad';
+  }
+  var FACE={happy:'😄',content:'☺️',hungry:'🥺',sleepy:'😴',sad:'🥹'};
+
+  function level(){ return Math.floor(Math.sqrt(state.friend/5))+1; }
+
+  function render(){
+    $('b-hunger').style.width=state.hunger+'%';
+    $('b-happy').style.width =state.happy +'%';
+    $('b-energy').style.width=state.energy+'%';
+    var m=mood();
+    pet.setAttribute('data-mood',m);
+    pet.classList.toggle('asleep',state.asleep);
+    faceEl.textContent=state.asleep?'💤':FACE[m];
+    nameEl.textContent=state.name;
+    lvlEl.textContent='♡ дружба '+level();
+    $('sleep').classList.toggle('on',state.asleep);
+    $('sleep').querySelector('.e').textContent=state.asleep?'☀️':'🌙';
+    $('sleep').lastChild.textContent=state.asleep?'Будить':'Спать';
+  }
+
+  /* ── speech ── */
+  var LINES={
+    happy:['Я так рад тебя видеть! 🥰','Сегодня лучший день! ✨','Ты самый лучший 💕','Давай ещё поиграем?'],
+    content:['Мне уютно с тобой ☺️','Мур-мур 🌸','Что новенького?','Хорошо сидим~'],
+    hungry:['Уже проголодался... 🥺','В животике урчит~','Перекусить бы 🍓','Покормишь меня?'],
+    sleepy:['Глазки слипаются... 😴','Можно поспать? 💤','Что-то я устал...','*зеваю* 🥱'],
+    sad:['Мне немножко грустно 🥺','Побудь со мной?','Обнимешь? 💗','Я скучал...']
+  };
+  var bubbleT;
+  function say(text,ms){
+    bubble.textContent=text; bubble.classList.add('show');
+    clearTimeout(bubbleT);
+    bubbleT=setTimeout(function(){ bubble.classList.remove('show'); }, ms||2600);
+  }
+  function autoSay(){
+    if(document.hidden) return;
+    if(state.asleep){ say('Споки... 💤',2000); return; }
+    var pool=LINES[mood()]||LINES.content;
+    say(pool[Math.floor(Math.random()*pool.length)]);
+  }
+
+  /* ── fx ── */
+  function burst(emoji,n){
+    var r=pet.getBoundingClientRect();
+    for(var i=0;i<(n||4);i++){(function(i){ setTimeout(function(){
+      var el=document.createElement('div'); el.className='fx'; el.textContent=emoji;
+      el.style.left=(r.left+r.width*(.25+Math.random()*.5))+'px';
+      el.style.top=(r.top+r.height*.3)+'px'; el.style.position='fixed';
+      document.body.appendChild(el); setTimeout(function(){ el.remove(); },1000);
+    }, i*90); })(i);}
+  }
+  function anim(cls,ms){ pet.classList.add(cls); setTimeout(function(){ pet.classList.remove(cls); }, ms); }
+
+  /* ── actions ── */
+  function feed(){
+    if(state.asleep){ say('Чшш... я сплю 💤'); return; }
+    state.hunger=clamp(state.hunger+28); state.happy=clamp(state.happy+4);
+    state.friend++; haptic('medium'); anim('chomp',420); anim('bounce',560);
+    burst('🍓',3); say(pick(['Ням-ням! 😋','Вкуснотища! 🍓','Спасибо! 💕'])); commit();
+  }
+  function play(){
+    if(state.asleep){ say('Чшш... я сплю 💤'); return; }
+    if(state.energy<12){ say('Нет сил играть... 😴'); return; }
+    state.happy=clamp(state.happy+24); state.energy=clamp(state.energy-10);
+    state.hunger=clamp(state.hunger-5); state.friend++; haptic('medium');
+    anim('bounce',560); burst('🎈',4); say(pick(['Йохо! 🎉','Ещё-ещё! ✨','Весело! 😆'])); commit();
+  }
+  function petAct(){
+    if(state.asleep){ say('Мур... 💤',1600); return; }
+    state.happy=clamp(state.happy+12); state.friend++; haptic('light');
+    anim('squish',300); burst('🤍',4); say(pick(['Мур~ 💗','Приятно... ☺️','Ещё погладь 🥰'])); commit();
+  }
+  function toggleSleep(){
+    state.asleep=!state.asleep; haptic('soft');
+    if(state.asleep){ say('Споки... 💤',2200); }
+    else{ notify('success'); say('Доброе утро! ☀️',2200); anim('bounce',560); }
+    commit();
+  }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function commit(){ state.last=Date.now(); render(); save(); }
+
+  /* ── rename ── */
+  nameEl.addEventListener('click',function(){
+    var n=prompt('Как зовут питомца?',state.name);
+    if(n&&n.trim()){ state.name=n.trim().slice(0,16); render(); save(); }
+  });
+
+  /* ── wire up ── */
+  $('feed').onclick=feed; $('play').onclick=play;
+  $('pet-btn').onclick=petAct; $('sleep').onclick=toggleSleep;
+  pet.onclick=petAct;
+
+  /* ── loops ── */
+  function blink(){
+    if(!state.asleep && mood()!=='happy' && mood()!=='sleepy'){
+      pet.classList.add('blink'); setTimeout(function(){ pet.classList.remove('blink'); },140);
+    }
+    setTimeout(blink, 2600+Math.random()*3200);
+  }
+  function tick(){ applyTime(); render(); save(); }
+
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ applyTime(); render(); } });
+
+  /* ── boot ── */
+  load(function(saved){
+    if(saved && typeof saved==='object'){
+      for(var k in state){ if(k in saved) state[k]=saved[k]; }
+    }
+    applyTime(); render(); save();
+    setTimeout(autoSay, 1200);
+    blink();
+    setInterval(tick, 20000);                 // decay + persist
+    setInterval(autoSay, 26000+Math.random()*14000); // spontaneous lines
+  });
+})();
+</script>
+
+
+</body></html>

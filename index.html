@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0047)file:///Users/a.mkhitaryan/Downloads/index.html -->
+<!-- saved from url=(0049)file:///Users/a.mkhitaryan/Downloads/index_1.html -->
 <html lang="ru" style="--tg-viewport-height: 100vh; --tg-viewport-stable-height: 100vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -170,11 +170,11 @@
 
   <div class="stats">
     <div class="pill"><div class="row"><span class="ico">🍓</span>Сытость</div>
-      <div class="bar hunger"><i id="b-hunger" style="width: 90.0361%;"></i></div></div>
+      <div class="bar hunger"><i id="b-hunger" style="width: 87.2871%;"></i></div></div>
     <div class="pill"><div class="row"><span class="ico">💕</span>Радость</div>
       <div class="bar happy"><i id="b-happy" style="width: 100%;"></i></div></div>
     <div class="pill"><div class="row"><span class="ico">⚡</span>Энергия</div>
-      <div class="bar energy"><i id="b-energy" style="width: 66.598%;"></i></div></div>
+      <div class="bar energy"><i id="b-energy" style="width: 81.9922%;"></i></div></div>
   </div>
 
   <div class="stage">
@@ -207,6 +207,21 @@
   if(tg){ try{ tg.ready(); tg.expand(); }catch(e){} }
   function haptic(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(t||'light'); }catch(e){} }
   function notify(t){ try{ tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(t||'success'); }catch(e){} }
+
+  /* ── Supabase: тихо сообщаем базе о событиях (для уведомлений) ── */
+  var SB_URL='https://tqbsxwbtzrnxrdvsttsr.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxYnN4d2J0enJueHJkdnN0dHNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTg4OTcsImV4cCI6MjEwMjczNDg5N30.zOe3BfcAbmHqbC18pZuZ9D2FbrCtqqf0XpgbsiDfDoI';
+  var chatId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+  function track(event){
+    if(!chatId) return;               // вне Telegram просто ничего не делаем
+    try{
+      fetch(SB_URL+'/rest/v1/rpc/ping',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+        body:JSON.stringify({p_chat_id:chatId, p_name:state.name, p_event:event||'open'})
+      }).catch(function(){});
+    }catch(e){}
+  }
 
   /* ── storage: Telegram CloudStorage → localStorage → memory ── */
   var KEY='mochi_v1', mem={};
@@ -314,7 +329,7 @@
     if(state.asleep){ say('Чшш... я сплю 💤'); return; }
     state.hunger=clamp(state.hunger+28); state.happy=clamp(state.happy+4);
     state.friend++; haptic('medium'); anim('chomp',420); anim('bounce',560);
-    burst('🍓',3); say(pick(['Ням-ням! 😋','Вкуснотища! 🍓','Спасибо! 💕'])); commit();
+    burst('🍓',3); say(pick(['Ням-ням! 😋','Вкуснотища! 🍓','Спасибо! 💕'])); commit(); track('feed');
   }
   function play(){
     if(state.asleep){ say('Чшш... я сплю 💤'); return; }
@@ -330,7 +345,7 @@
   }
   function toggleSleep(){
     state.asleep=!state.asleep; haptic('soft');
-    if(state.asleep){ say('Споки... 💤',2200); }
+    if(state.asleep){ say('Споки... 💤',2200); track('sleep'); }
     else{ notify('success'); say('Доброе утро! ☀️',2200); anim('bounce',560); }
     commit();
   }
@@ -365,6 +380,7 @@
       for(var k in state){ if(k in saved) state[k]=saved[k]; }
     }
     applyTime(); render(); save();
+    track('open');                            // регистрируем в базе
     setTimeout(autoSay, 1200);
     blink();
     setInterval(tick, 20000);                 // decay + persist
